@@ -1,5 +1,6 @@
 import tweepy #https://github.com/tweepy/tweepy
 import csv
+import pandas as pd
 
 #Twitter API credentials
 consumer_key = "7ZRs5AtYV997Tmis9JnWMKv1z"
@@ -23,11 +24,11 @@ auth.set_access_token(access_key, access_secret)
   
 # Calling api 3
 api = tweepy.API(auth) 
-  
 
+followers_array=[]
 
 # Function to extract tweets 
-def get_tweets(username,tweetRec): 
+def get_tweets(username): 
           
 
         # 200 tweets to be extracted 
@@ -37,37 +38,31 @@ def get_tweets(username,tweetRec):
   
         # create array of tweet information: username,  
         # tweet id, date/time, text 
-        tweets_for_csv = [tweet.text for tweet in tweets] # CSV file created  
-        for j in tweets_for_csv: 
-            tweetRec=tweetRec+1
-            # Appending tweets to the empty array tmp 
-            tmp.append([tweetRec,username,j])  
+        for tweet in tweets:
+            tmp.append({"User":username, "Tweets":tweet.text, "Time":tweet.created_at})
 
+
+
+#collecting a list of followers
+for user in tweepy.Cursor(api.followers, screen_name="brycemanheart").items():
+    followers_array.append(user.screen_name)
+    print(user.screen_name)
     
-  
-user_handles_array=["southwestair", "brycemanheart"]
 
-for user_handle in user_handles_array:
+for user_handle in followers_array:
     # Driver code 
     if __name__ == '__main__': 
-  
-        # Here goes the twitter handle for the user 
-        # whose tweets are to be extracted. 
-        get_tweets(user_handle,tweetRec)  
-        
+        try:
+            # Here goes the twitter handle for the user 
+            # whose tweets are to be extracted. 
+            get_tweets(user_handle)  
+        except:
+            continue
 
+twitterData=pd.DataFrame(tmp)
+twitterData.to_csv('C:/Users/Laptop/Documents/tweetset.csv')
 print(tmp)
 
 
 
 
-#collecting a list of followers
-auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
-auth.set_access_token(access_token, access_token_secret)
-api = tweepy.API(auth)
-
-for user in tweepy.Cursor(api.friends, screen_name="TechCrunch").items():
-    print('friend: ' + user.screen_name)
-
-for user in tweepy.Cursor(api.followers, screen_name="TechCrunch").items():
-    print('follower: ' + user.screen_name)
