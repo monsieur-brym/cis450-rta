@@ -23,7 +23,7 @@ auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
 auth.set_access_token(access_key, access_secret) 
   
 # Calling api 3
-api = tweepy.API(auth) 
+api = tweepy.API(auth, wait_on_rate_limit=True) 
 
 followers_array=[]
 
@@ -38,15 +38,19 @@ def get_tweets(username):
   
         # create array of tweet information: username,  
         # tweet id, date/time, text 
-        for tweet in tweets:
-            tmp.append({"User":username, "Tweets":tweet.text, "Time":tweet.created_at})
-
-
 
 #collecting a list of followers
-for user in tweepy.Cursor(api.followers, screen_name="brycemanheart").items():
-    followers_array.append(user.screen_name)
-    print(user.screen_name)
+print("getting followers")
+i=0
+for user in tweepy.Cursor(api.followers, screen_name="USAA").items():
+    try:
+        followers_array.append(user.screen_name)
+        i=i+1
+        print(str(i)+". ", end=" ")
+        if i >= 400:
+            break
+    except:
+        continue
     
 
 for user_handle in followers_array:
@@ -62,7 +66,3 @@ for user_handle in followers_array:
 twitterData=pd.DataFrame(tmp)
 twitterData.to_csv('C:/Users/Laptop/Documents/tweetset.csv')
 print(tmp)
-
-
-
-
