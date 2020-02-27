@@ -38,6 +38,10 @@ def get_tweets(username):
   
         # create array of tweet information: username,  
         # tweet id, date/time, text 
+        for tweet in tweets:
+            tmp.append({"User":username, "Tweets":tweet.text, "Time":tweet.created_at})
+
+
 
 #collecting a list of followers
 print("getting followers")
@@ -47,12 +51,12 @@ for user in tweepy.Cursor(api.followers, screen_name="USAA").items():
         followers_array.append(user.screen_name)
         i=i+1
         print(str(i)+". ", end=" ")
-        if i >= 400:
+        if i >= 600:
             break
     except:
         continue
     
-
+#FUNCTION CALL - GET TWEETS FROM FOLLOWERS_ARRAY
 for user_handle in followers_array:
     # Driver code 
     if __name__ == '__main__': 
