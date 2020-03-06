@@ -1,6 +1,6 @@
 
 select contacts.ContactID, state, ethnicity, 
-max(ApplicationStatusDate) as 'Most recent status date', count(inquiries.CreatedTime) As 'Total Number of Inquiries', 
+max(ApplicationStatusDate) as 'Most recent status date', count(inquiries.CreatedTime) As 'Total Inquiries', 
 case 
   when max(education.gpa) > 0 then max(education.gpa)
   else '0'
@@ -19,30 +19,62 @@ case
 end as 'AZ', 
 max(case 
 	when classlevel = 'Freshman'then 1
-	when classlevel = 'Sophomore' then 2
-    when classlevel = 'Junior' then 3
-    when classlevel = 'Senior' then 4
-    when classlevel = 'Post Degree' then 5
-    when classlevel = 'Graduate' then 6
-    when classlevel = 'Doctoral' then 7
     else '0'
-end) as ClassLevel,
+end) as Freshman,
+max(case 
+	when classlevel = 'Sophomore'then 1
+    else '0'
+end) as Sophomore,
+max(case 
+	when classlevel = 'Junior'then 1
+    else '0'
+end) as Junior,
+max(case 
+	when classlevel = 'Senior'then 1
+    else '0'
+end) as Senior,
+max(case 
+	when classlevel = 'Post Degree'then 1
+    else '0'
+end) as PostDegree,
+max(case 
+	when classlevel = 'Graduate'then 1
+    else '0'
+end) as Graduate,
+max(case 
+	when classlevel = 'Doctoral'then 1
+    else '0'
+end) as Doctoral,
+
 max(case
 	when collegeattend = 'Returning' then 1
     else '0'
 end) as Returning,
 max(case 
-	when educationtype = 'Doctorate' then 5
-    when educationtype = 'Graduate' then 4
-    when educationtype = 'Undergraduate' then 3
-    when educationtype = 'College' then 2
     when educationtype = 'Certificate' then 1
     else '0'
-end) as HighestDegree,
+end) as Certificate,
+max(case 
+    when educationtype = 'College' then 1
+    else '0'
+end) as College,
+max(case 
+    when educationtype = 'Undergraduate' then 1
+    else '0'
+end) as Undergraduate,
+max(case 
+    when educationtype = 'Graduate' then 1
+    else '0'
+end) as Graduate,
+max(case 
+    when educationtype = 'Doctorate' then 1
+    else '0'
+end) as Doctorate,
+
 case
 	when ApplicationsStatus = 'Confirmed' then 1
     else '0'
-end as Confirmed
+end as Confirmed 
 
 from contacts, education, applications, inquiries
 where contacts.ContactID = education.ContactID AND
