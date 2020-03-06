@@ -1,0 +1,48 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Jan 29 14:45:19 2020
+
+@author: allyt
+"""
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn import metrics
+import seaborn as sn
+import operator
+
+mydata = pd.read_csv("C:\\Users\\allyt\\Documents\\Spring2020\\CIS450\\studentcase.csv")
+
+df = pd.DataFrame(mydata)
+
+X = df[['Gender','AZ','ClassLevel','Returning','HighestDegree','Total Number of Inquiries']]
+y = df['Confirmed']
+
+X_train,X_test,y_train,y_test = train_test_split(X,y,test_size=0.25,random_state=0)
+
+logistic_regression= LogisticRegression()
+logistic_regression.fit(X_train,y_train)
+y_pred=logistic_regression.predict(X_test)
+
+confusion_matrix = pd.crosstab(y_test, y_pred, rownames=['Actual'], colnames=['Predicted'])
+print(confusion_matrix)
+
+print('Accuracy: ',metrics.accuracy_score(y_test, y_pred))
+likely = []
+for i in range(1,5045):
+    if logistic_regression.predict(X[i:i+1]) ==1:
+        row = df[i:i+1]
+        contactID = row["ContactID"].values
+        con = contactID[0]
+        prob = logistic_regression.predict_proba(X[i:i+1])[:,1][0]
+        likely.append((con,prob))
+        
+likely.sort(key=operator.itemgetter(1),reverse=1)
+print("Students likely to attend:")
+print(likely)
+
+        
+import statsmodels.api as sm
+logit_model=sm.Logit(y,X)
+result=logit_model.fit()
+print(result.summary2())
