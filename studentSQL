@@ -1,0 +1,53 @@
+
+select contacts.ContactID, state, ethnicity, 
+max(ApplicationStatusDate) as 'Most recent status date', count(inquiries.CreatedTime) As 'Total Number of Inquiries', 
+case 
+  when max(education.gpa) > 0 then max(education.gpa)
+  else '0'
+end as maxGPA, 
+case
+	when campusvisit = 'Yes' then 1
+    else '0'
+end as campusvisit,
+case
+	when gender = 'Male' then 1
+    else '0'
+end as Gender,
+case 
+	when state ='Arizona' then 1 
+    else '0'
+end as 'AZ', 
+max(case 
+	when classlevel = 'Freshman'then 1
+	when classlevel = 'Sophomore' then 2
+    when classlevel = 'Junior' then 3
+    when classlevel = 'Senior' then 4
+    when classlevel = 'Post Degree' then 5
+    when classlevel = 'Graduate' then 6
+    when classlevel = 'Doctoral' then 7
+    else '0'
+end) as ClassLevel,
+max(case
+	when collegeattend = 'Returning' then 1
+    else '0'
+end) as Returning,
+max(case 
+	when educationtype = 'Doctorate' then 5
+    when educationtype = 'Graduate' then 4
+    when educationtype = 'Undergraduate' then 3
+    when educationtype = 'College' then 2
+    when educationtype = 'Certificate' then 1
+    else '0'
+end) as HighestDegree,
+case
+	when ApplicationsStatus = 'Confirmed' then 1
+    else '0'
+end as Confirmed
+
+from contacts, education, applications, inquiries
+where contacts.ContactID = education.ContactID AND
+contacts.ContactID = applications.ContactID AND 
+contacts.ContactID = inquiries.ContactID 
+
+
+group by ContactID, gender, state, ethnicity;
