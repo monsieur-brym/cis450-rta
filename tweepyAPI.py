@@ -7,12 +7,11 @@ consumer_key = "7ZRs5AtYV997Tmis9JnWMKv1z"
 consumer_secret = "FoQOqkwndAeN7wdFKbXtdlmyoGvEKmeHs3bjvyuexWtpD8PKV1"
 access_key = "2849778937-xyg9uH795FTYOc0nm6i6ve6xC0w8ulJf8Vs4d1z"
 access_secret = "4RFa7O8bSa37tHerJPikLQmA5S4oL0KdfGzFC5AOj6UBY"
-
 tweets_for_csv = []
-
 global tmp
 tmp=[]
-
+global twitterData
+twitterData=[]
 global tweetRec
 tweetRec = 0
 
@@ -26,6 +25,8 @@ auth.set_access_token(access_key, access_secret)
 api = tweepy.API(auth, wait_on_rate_limit=True) 
 
 followers_array=[]
+#words to filter tweets
+filter_words = ["birthday","trump"]
 
 # Function to extract tweets 
 def get_tweets(username): 
@@ -43,6 +44,13 @@ def get_tweets(username):
 
 
 
+def filter_tweets_df(tmp_list):
+    twitterData=pd.DataFrame(tmp)
+    twitterData['Tweets'] = twitterData['Tweets'].apply(lambda x: x.lower())
+    for fw in filter_words:
+        twitterData = twitterData[~twitterData.Tweets.str.contains(fw)]
+    return twitterData
+
 #collecting a list of followers
 print("getting followers")
 i=0
@@ -51,7 +59,7 @@ for user in tweepy.Cursor(api.followers, screen_name="USAA").items():
         followers_array.append(user.screen_name)
         i=i+1
         print(str(i)+". ", end=" ")
-        if i >= 600:
+        if i >= 100:
             break
     except:
         continue
@@ -67,6 +75,8 @@ for user_handle in followers_array:
         except:
             continue
 
-twitterData=pd.DataFrame(tmp)
+
+twitterData = filter_tweets_df(tmp)
+
 twitterData.to_csv('C:/Users/Laptop/Documents/tweetset.csv')
 print(tmp)
