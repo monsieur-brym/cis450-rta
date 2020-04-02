@@ -68,6 +68,15 @@ len(svd_model.components_)
 
 terms = vectorizer.get_feature_names()
 
+final ={"topic": [0,1,2,3,4],"term 1": [],"term 2": [],
+        "term 3": [], "term 4": [], "term 5": [], "tweet1": [], "tweet2":[],
+        "tweet3":[]}
+
+term1,term2,term3, term4, term5 = [],[],[],[],[]
+tweet1, tweet2, tweet3 = [],[],[]
+
+
+
 for i, comp in enumerate(svd_model.components_):
     terms_comp = zip(terms, comp)
     sorted_terms = sorted(terms_comp, key= lambda x:x[1], reverse=True)[:5]
@@ -76,6 +85,12 @@ for i, comp in enumerate(svd_model.components_):
         print(t[0])
         print(" ")
         
+    term1.append(sorted_terms[0][0])
+    term2.append(sorted_terms[1][0])
+    term3.append(sorted_terms[2][0])
+    term4.append(sorted_terms[3][0])  
+    term5.append(sorted_terms[4][0])
+    
     topic=[]
     for i in sorted_terms:
         topic.append(i[0])
@@ -85,16 +100,9 @@ for i, comp in enumerate(svd_model.components_):
     for j in range(numtweet):
         Tweetvec = tokenized_doc[j]
         sim = 0
-        if topic[0] in Tweetvec:
-                sim+=1    
-        if topic[1] in Tweetvec:
-                sim+=.75
-        if topic[2] in Tweetvec:
-                sim+=.50
-        if topic[3] in Tweetvec:
-                sim+=.25
-        if topic[4] in Tweetvec:
-                sim+=.1  
+        for n in range(5):
+            if topic[n] in Tweetvec:
+                sim+= sorted_terms[n][1]
         vecsim=(j,sim)
         simlist.append(vecsim)
         
@@ -105,6 +113,24 @@ for i, comp in enumerate(svd_model.components_):
         tweet=simlist[t][0]
         print()
         print(data[tweet])
-            
-            
+        
+    tweet1.append(data[simlist[0][0]])
+    tweet2.append(data[simlist[1][0]])
+    tweet3.append(data[simlist[2][0]])
+
+final["term 1"]=term1
+final["term 2"]=term2
+final["term 3"]=term3
+final["term 4"]=term4
+final["term 5"]=term5
+final["tweet1"]=tweet1
+final["tweet2"]=tweet2
+final["tweet3"]=tweet3
+
+df = pd.DataFrame(final, columns = ["topic", "term 1", "term 2", "term 3",
+                                    "term 4", "term 5", "tweet1", "tweet2",
+                                    "tweet3"])
+
+df.to_excel(r'C:\Users\allyt\documents\Spring2020\CIS450\export_topics.xlsx', index = False, header = True)
+
         
